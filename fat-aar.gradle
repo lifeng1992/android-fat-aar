@@ -220,7 +220,7 @@ task generateRJava {
 		if(!file("$aarPath/AndroidManifest.xml").exists())
 		{
 			println "$aarPath doesn't have AndroidManifest.xml"			
-			return;
+			return
 		}
 
 		// Now generate the R.java file for each embedded dependency
