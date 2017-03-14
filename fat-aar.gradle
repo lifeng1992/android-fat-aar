@@ -78,7 +78,7 @@ ext.build_dir = buildDir.path.replace(File.separator, '/');
 
 ext.exploded_aar_dir = "$build_dir/intermediates/exploded-aar";
 ext.classs_release_dir = "$build_dir/intermediates/classes/release";
-ext.bundle_release_dir = "$build_dir/intermediates/bundles/release";
+ext.bundle_default_dir = "$build_dir/intermediates/bundles/default";
 ext.manifest_aaapt_dir = "$build_dir/intermediates/manifests/aapt/release";
 ext.generated_rsrc_dir = "$build_dir/generated/source/r/release";
 
@@ -198,7 +198,7 @@ task embedProguard {
 	doLast {
 		println "Running FAT-AAR Task :embedProguard"
 
-		def proguardRelease = file("$bundle_release_dir/proguard.txt")
+		def proguardRelease = file("$bundle_default_dir/proguard.txt")
 		embeddedAarDirs.each { aarPath ->
 			try {
 				def proguardLibFile = file("$aarPath/proguard.txt")
@@ -278,7 +278,7 @@ task collectRClass {
 }
 
 task embedRClass(type: org.gradle.jvm.tasks.Jar, dependsOn: collectRClass) {
-    destinationDir file("$bundle_release_dir/libs/")
+    destinationDir file("$bundle_default_dir/libs/")
     from base_r2x_dir
 }
 
@@ -304,13 +304,13 @@ task embedJavaJars(dependsOn: embedRClass) {
 
 			copy {
 				from jars
-				into file("$bundle_release_dir/libs")
+				into file("$bundle_default_dir/libs")
 			}
 
 			// Copy all embedded jar files to bundle lib
 			copy {
 				from embeddedJars
-				into file("$bundle_release_dir/libs")
+				into file("$bundle_default_dir/libs")
 			}
 		}
     }
@@ -328,7 +328,7 @@ task embedJniLibs {
 			// Copy JNI Folders
 			copy {
 				from fileTree(dir: "$aarPath/jni")
-				into file("$bundle_release_dir/jni")
+				into file("$bundle_default_dir/jni")
 			}
 		}
     }
@@ -349,8 +349,8 @@ task embedManifests {
 
 		File reportFile = file("${build_dir}/embedManifestReport.txt")
 
-		File origManifest = file("$bundle_release_dir/AndroidManifest.xml")
-		File copyManifest = file("$bundle_release_dir/AndroidManifest.orig.xml")
+		File origManifest = file("$bundle_default_dir/AndroidManifest.xml")
+		File copyManifest = file("$bundle_default_dir/AndroidManifest.orig.xml")
 		File aaptManifest = file("$manifest_aaapt_dir/AndroidManifest.xml")
 
 		copy {
