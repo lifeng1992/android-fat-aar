@@ -10,6 +10,7 @@ Gradle script that allows you to merge and embed dependencies in generted aar fi
 **Fix**
 
 1. The Android build tools have changed a task name: transformNative_libsWithSyncJniLibsForRelease -> transformNativeLibsWithSyncJniLibsForRelease
+2. The Task.leftShift(Closure) method has been deprecated and is scheduled to be removed in Gradle 5.0: I used [mrhaki's][http://mrhaki.blogspot.com.br/2016/11/gradle-goodness-replacing-operator-for.html] approach.
 
 **Why do I need is a fat AAR?**
 
