@@ -8,8 +8,9 @@ Gradle script that allows you to merge and embed dependencies in generted aar fi
 [jonbryantnz](https://github.com/jonbryantnz) suggested method to embed java projects.
 
 **Fix**
-The Android build tools have changed a task name: transformNative_libsWithSyncJniLibsForRelease -> transformNativeLibsWithSyncJniLibsForRelease
-The Task.leftShift(Closure) method has been deprecated and is scheduled to be removed in Gradle 5.0: I used the http://mrhaki.blogspot.com.br/2016/11/gradle-goodness-replacing-operator-for.html 's approach
+
+1. The Android build tools have changed a task name: transformNative_libsWithSyncJniLibsForRelease -> transformNativeLibsWithSyncJniLibsForRelease
+2. The Task.leftShift(Closure) method has been deprecated and is scheduled to be removed in Gradle 5.0: I used the http://mrhaki.blogspot.com.br/2016/11/gradle-goodness-replacing-operator-for.html 's approach
 
 **Why do I need is a fat AAR?**
 
