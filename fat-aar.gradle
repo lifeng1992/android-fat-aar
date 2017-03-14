@@ -216,56 +216,55 @@ task embedProguard {
 task generateRJava {
 	doLast {
 		println "Running FAT-AAR Task :generateRJava"
-		
-		if(!file("$aarPath/AndroidManifest.xml").exists())
-		{
-			println "$aarPath doesn't have AndroidManifest.xml"			
-			return
-		}
 
 		// Now generate the R.java file for each embedded dependency
 		def libPackageName = new XmlParser().parse(android.sourceSets.main.manifest.srcFile).@package
 
 		embeddedAarDirs.each { aarPath ->
+		
+			if(file("$aarPath/AndroidManifest.xml").exists())
+			{
+				def aarManifest = new XmlParser().parse(file("$aarPath/AndroidManifest.xml"));
+				def aarPackageName = aarManifest.@package
+				String packagePath = aarPackageName.replace('.', '/')
 
-			def aarManifest = new XmlParser().parse(file("$aarPath/AndroidManifest.xml"));
-			def aarPackageName = aarManifest.@package
-			String packagePath = aarPackageName.replace('.', '/')
+				// Generate the R.java file and map to current project's R.java
+				// This will recreate the class file
+				def rTxt = file("$aarPath/R.txt")
+				def rMap = new ConfigObject()
 
-			// Generate the R.java file and map to current project's R.java
-			// This will recreate the class file
-			def rTxt = file("$aarPath/R.txt")
-			def rMap = new ConfigObject()
-
-			if (rTxt.exists()) {
-				rTxt.eachLine {
-					line ->
-						//noinspection GroovyUnusedAssignment
-						def (type, subclass, name, value) = line.tokenize(' ')
-						rMap[subclass].putAt(name, type)
-				}
-			}
-
-			def sb = "package $aarPackageName;" << '\n' << '\n'
-			sb << 'public final class R {' << '\n'
-
-			rMap.each {
-				subclass, values ->
-					sb << "  public static final class $subclass {" << '\n'
-					values.each {
-						name, type ->
-							sb << "    public static $type $name = ${libPackageName}.R.${subclass}.${name};" << '\n'
+				if (rTxt.exists()) {
+					rTxt.eachLine {
+						line ->
+							//noinspection GroovyUnusedAssignment
+							def (type, subclass, name, value) = line.tokenize(' ')
+							rMap[subclass].putAt(name, type)
 					}
-					sb << "    }" << '\n'
+				}
+
+				def sb = "package $aarPackageName;" << '\n' << '\n'
+				sb << 'public final class R {' << '\n'
+
+				rMap.each {
+					subclass, values ->
+						sb << "  public static final class $subclass {" << '\n'
+						values.each {
+							name, type ->
+								sb << "    public static $type $name = ${libPackageName}.R.${subclass}.${name};" << '\n'
+						}
+						sb << "    }" << '\n'
+				}
+
+				sb << '}' << '\n'
+
+				mkdir("$generated_rsrc_dir/$packagePath")
+				file("$generated_rsrc_dir/$packagePath/R.java").write(sb.toString())
+
+				embeddedRClasses += "$packagePath/R.class"
+				embeddedRClasses += "$packagePath/R\$*.class"
+			} else {
+				println "$aarPath doesn't have AndroidManifest.xml"			
 			}
-
-			sb << '}' << '\n'
-
-			mkdir("$generated_rsrc_dir/$packagePath")
-			file("$generated_rsrc_dir/$packagePath/R.java").write(sb.toString())
-
-			embeddedRClasses += "$packagePath/R.class"
-			embeddedRClasses += "$packagePath/R\$*.class"
 		}
     }
 }
